@@ -9,38 +9,56 @@ const getFoods = async () => {
 };
 const showFoods = (meals) => {
 	container.innerHTML = "";
+	if (!container.classList.contains("grid")) {
+		container.classList.add("grid");
+	}
 	meals.forEach((meal) => {
-		let foodCard = document.createElement("div");
+		let foodCard = document.createElement("article");
 		foodCard.innerHTML = `
-        <h2 onclick="foodDetail(${meal.idMeal})">${meal.strMeal}</h2>
+		<img onclick="foodDetail(${meal.idMeal})" src="${meal.strMealThumb}" class="cardImg img-fluid" />
+		<h2 onclick="foodDetail(${meal.idMeal})">${meal.strMeal}</h2>
         `;
 		container.appendChild(foodCard);
 	});
 };
 
 const foodDetail = async (meal) => {
+	container.innerHTML = "";
+	container.classList.toggle("grid");
 	let food_url = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal}`;
 	let foodResponse = await fetch(food_url);
 	let food = await foodResponse.json();
 	var foodItem = food.meals;
 	// console.log(fo);
 	container.innerHTML = `
-    <h2>${foodItem[0].strMeal}</h2>
+	<article style="width: 100%; display: flex">
+	<div style=" width:60%; padding-right:10px">
+	<img src="${foodItem[0].strMealThumb}" style=" width: 100%; object-fit: cover;  height: 400px;"/>
+	</div>
+	<div style=" width:40%" id="listIT">
+	<h2>${foodItem[0].strMeal}</h2>
     <h4>Ingredients:</h4>
+	</div>
+
+	</article>
     `;
 	getIngredients(foodItem[0]);
 };
 const getIngredients = (foodItem) => {
+	if (container.classList.contains("grid")) {
+		container.classList.toggle("grid");
+	}
 	let items = new Array();
+	let listIt = document.querySelector("#listIT");
 	for (i = 0; i <= 20; ++i) {
 		let a = "strIngredient" + i;
 		let b = foodItem[a];
-		if (b != " " && b != "" && b != "null" && b != undefined) {
+		if (b != " " && b != "" && b != null && b != undefined) {
 			items.push(b);
 		}
 	}
 	let ingredients = document.createElement("ol");
-	container.appendChild(ingredients);
+	listIT.appendChild(ingredients);
 	items.forEach((item) => {
 		let listofItems = document.createElement("li");
 		listofItems.innerHTML = item;
